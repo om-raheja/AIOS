@@ -82,11 +82,11 @@ def main():
     #     "example/travel_agent", "I want to take a trip to Paris, France from July 4th to July 10th 2024 and I am traveling from New York City. Help me plan this trip."
     # )
 
-    # math_agent = agent_thread_pool.submit(
-    #     agent_factory.run_agent,
-    #     "example/math_agent",
-    #     "Convert 15000 MXN to Canadian Dollars and find out how much it would be in USD if 1 CAD equals 0.79 USD."
-    # )
+    math_agent = agent_thread_pool.submit(
+        agent_factory.run_agent,
+        "example/math_agent",
+        "Convert 15000 MXN to Canadian Dollars and find out how much it would be in USD if 1 CAD equals 0.79 USD."
+    )
 
     academic_agent = agent_thread_pool.submit(
         agent_factory.run_agent,
@@ -99,15 +99,17 @@ def main():
     #     "example/rec_agent", "Recommend two movies with groundbreaking visual effects released in the last fifteen years ranked between 1 and 20 with ratings above 8.0."
     # )
 
-    creation_agent = agent_thread_pool.submit(
-        agent_factory.run_agent,
-        "example/creation_agent", "Create an image of a lush jungle with an ancient temple, evoking a sense of mystery and adventure."
-    )
+    """ example should always be as accessible as possible """
+
+    #creation_agent = agent_thread_pool.submit(
+    #    agent_factory.run_agent,
+    #    "example/creation_agent", "Create an image of a lush jungle with an ancient temple, evoking a sense of mystery and adventure."
+    #)
 
     # agent_tasks = [travel_agent, rec_agent, creation_agent, math_agent, academic_agent]
     # agent_tasks = [rec_agent]
     # agent_tasks = [creation_agent]
-    agent_tasks = [academic_agent, creation_agent]
+    agent_tasks = [academic_agent, math_agent]
     # agent_tasks = [creation_agent]
 
     for r in as_completed(agent_tasks):

@@ -13,6 +13,7 @@ class MathAgent(ReactAgent):
         return super().automatic_workflow()
 
     def manual_workflow(self):
+        # TODO: add pemdas calculation support in the future
         workflow = [
             {
                 "message": "identify the tool to call to do some pre-calculation. ",

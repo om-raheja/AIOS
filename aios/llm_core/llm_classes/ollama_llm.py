@@ -43,6 +43,7 @@ class OllamaLLM(BaseLLM):
             level = "executing"
         )
 
+        # with and without overhead for tool handling
         if tools:
             messages = self.tool_calling_input_format(messages, tools)
             response = ollama.chat(
@@ -77,8 +78,6 @@ class OllamaLLM(BaseLLM):
                 )
             )
             result = response['message']['content']
-
-            # print(f"***** original result: {result} *****")
 
             if message_return_type == "json":
                 result = self.parse_json_format(result)

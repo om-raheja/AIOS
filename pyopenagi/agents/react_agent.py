@@ -36,28 +36,27 @@ class ReactAgent(BaseAgent):
             ]
         )
 
-        plan_instruction = "".join(
-            [
-                f'You are given the available tools from the tool list: {json.dumps(self.tool_info)} to help you solve problems. ',
-                'Generate a plan of steps you need to take. ',
-                'The plan must follow the json format as: ',
-                '[',
-                '{"message": "message_value1","tool_use": [tool_name1, tool_name2,...]}',
-                '{"message": "message_value2", "tool_use": [tool_name1, tool_name2,...]}',
-                '...',
-                ']',
-                'In each step of the planned workflow, you must select the most related tool to use',
-                'Followings are some plan examples:',
-                '[',
-                '{"message": "gather information from arxiv. ", "tool_use": ["arxiv"]},',
-                '{"message", "write a summarization based on the gathered information. ", "tool_use": []}',
-                '];',
-                '[',
-                '{"message": "identify the tool that you need to call to obtain information. ", "tool_use": ["imdb_top_movies", "imdb_top_series"]},',
-                '{"message", "give recommendations for the user based on the information. ", "tool_use": []}',
-                '];',
-            ]
-        )
+        plan_instruction =  f"""
+You are given the available tools from the tool list: {json.dumps(self.tool_info)} to help you solve problems.
+Generate a plan of steps you need to take. 
+The plan must follow the json format as: 
+[
+{{"message": "message_value1","tool_use": [tool_name1, tool_name2,...]}},
+{{"message": "message_value2", "tool_use": [tool_name1, tool_name2,...]}}
+...
+]
+In each step of the planned workflow, you must select the most related tool to use
+Followings are some plan examples:
+[
+{{"message": "gather information from arxiv. ", "tool_use": ["arxiv"]}},
+{{"message", "write a summarization based on the gathered information. ", "tool_use": []}}
+];
+[
+{{"message": "identify the tool that you need to call to obtain information. ", "tool_use": ["imdb_top_movies", "imdb_top_series"]}},
+{{"message", "give recommendations for the user based on the information. ", "tool_use": []}}
+];
+Your outputs are restricted to only JSON format.
+        """
 
         if self.workflow_mode == "manual":
             self.messages.append(
@@ -89,8 +88,10 @@ class ReactAgent(BaseAgent):
             function_params = tool_call["parameters"]
 
             try:
-                function_response = function_to_call.run(function_params)
+                # printed in both scenarios for easier debugging
                 actions.append(f"I will call the {function_name} with the params as {function_params}")
+
+                function_response = function_to_call.run(function_params)
                 observations.append(f"The knowledge I get from {function_name} is: {function_response}")
 
             except Exception:
@@ -191,7 +192,7 @@ class ReactAgent(BaseAgent):
                 if i == len(workflow) - 1:
                     final_result = self.messages[-1]
 
-                self.logger.log(f"At step {i + 1}, {self.messages[-1]}\n", level="info")
+                self.logger.log(f"At step {i + 1}, {self.messages[-1]['content']}\n", level="info")
 
                 self.rounds += 1
 
