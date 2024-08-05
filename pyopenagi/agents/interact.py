@@ -1,3 +1,6 @@
+# executable that you can use to upload to the agent hub and download from it
+# we also use this to check dependencies to run agents
+
 import argparse
 import json
 import subprocess
@@ -173,33 +176,38 @@ class Interactor:
             file.write(code_data)
 
     def check_reqs_installed(self, agent):
-    # Run the `conda list` command and capture the output
+        # Run the `conda list` command and capture the output
         reqs_path = os.path.join(self.base_folder, agent, "meta_requirements.txt")
 
-        result = subprocess.run(['conda', 'list'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        # Decode the output from bytes to string
-        with open(reqs_path, "r") as f:
-            reqs = []
-            lines = f.readlines()
-            for line in lines:
-                line = line.replace("\n", "")
-                if "==" in line:
-                    reqs.append(line.split("==")[0])
-                else:
-                    reqs.append(line)
 
-        output = result.stdout.decode('utf-8')
+        try: 
+            result = subprocess.run(['conda', 'list'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            # Decode the output from bytes to string
+            with open(reqs_path, "r") as f:
+                reqs = []
+                lines = f.readlines()
+                for line in lines:
+                    line = line.replace("\n", "")
+                    if "==" in line:
+                        reqs.append(line.split("==")[0])
+                    else:
+                        reqs.append(line)
 
-        # Extract the list of installed packages
-        installed_packages = [line.split()[0] for line in output.splitlines() if line]
+            output = result.stdout.decode('utf-8')
 
-        # Check for each package if it is installed
-        for req in reqs:
-            if req not in installed_packages:
-                return False
+            # Extract the list of installed packages
+            installed_packages = [line.split()[0] for line in output.splitlines() if line]
 
-        return True
+            # Check for each package if it is installed
+            for req in reqs:
+                if req not in installed_packages:
+                    return False
 
+            return True
+
+        except FileNotFoundError:
+            print("Conda not installed. Assuming requirements are installed through a venv.")
+            return True
 
     def install_agent_reqs(self, agent):
         reqs_path = os.path.join(self.base_folder, agent, "meta_requirements.txt")
